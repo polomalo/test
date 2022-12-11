@@ -1,0 +1,46 @@
+*{
+    box-sizing: border-box;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+}
+
+.container{
+    width: 1200px;
+    margin: 0 auto;
+}
+
+.row{
+    display: flex;
+}
+
+.col-6{
+    width: 50%;
+}
+
+.header__devices{
+    margin: 20px auto;
+}
+
+.header__devices--iphone, .header__devices--ipad{
+    text-align: center;
+}
+
+.header__devices--iphone > i, .header__devices--ipad > i{
+    font-size: 50px;
+}
+
+.header__message{
+    text-align: center;
+    
+}
+
+#scene {
+    margin: 200px;
+    width: 318px;
+    height: 566px;
+}
