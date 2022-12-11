@@ -1,12 +1,12 @@
 import * as PIXI from 'pixi.js'
 
 let app = new PIXI.Application({
-  // width: 720,
-  // height: 1280,
-  //backgroundColor: 0x1099bb,
-  view: document.querySelector('#scene'),
-  resolution: window.devicePixelRatio || 1,
-  antialias: true
+    // width: 720,
+    // height: 1280,
+    //backgroundColor: 0x1099bb,
+    view: document.querySelector('#scene'),
+    resolution: window.devicePixelRatio || 1,
+    antialias: true
 });
 
 let pairs = 0;
@@ -17,10 +17,16 @@ let background = PIXI.Texture.from('assets/back.png');
 let back = new PIXI.Sprite(background);
 let cards = [];
 let slotTextures = [
-  PIXI.Texture.from('assets/dimond.png'),
-  PIXI.Texture.from('assets/spades.png'),
-  PIXI.Texture.from('assets/hearts.png'),
-  PIXI.Texture.from('assets/clubs.png'),
+    PIXI.Texture.from('assets/dimond.png'),
+    PIXI.Texture.from('assets/spades.png'),
+    PIXI.Texture.from('assets/hearts.png'),
+    PIXI.Texture.from('assets/clubs.png'),
+];
+let test1 = [
+    'dimond',
+    'spades',
+    'hearts',
+    'clubs'
 ];
 
 back.width = app.screen.width;
@@ -44,24 +50,36 @@ let container = new PIXI.Container();
 app.stage.addChild(container);
 
 let names = []
+let keks
 for (let i = 0; i < 6; i++) {
-  let card = new PIXI.Sprite(textureCard);
-  card.width = 160;
-  card.height = 130;
-  card.anchor.set(0.5);
-  card.x = (i % 3) * 190;
-  card.y = Math.floor(i / 3) * 140;
-  card.interactive = true;
-  card.cursor = 'pointer';
-  
-  if (pairs == 2){
-    console.log('you win!')
-  } else {
-    card
-        .on('pointerdown', onButtonDown)
-        .on('pointerup', onButtonUp)
-  }
-  container.addChild(card);
+    let cardContainer = new PIXI.Container();
+    let card = new PIXI.Sprite(textureCard);
+    //cardContainer.addChild(card);
+    cardContainer.width = 160;
+    cardContainer.height = 130;
+    
+    card.width = 160;
+    card.height = 130;
+    card.anchor.set(0.5);
+    card.x = (i % 3) * 190;
+    card.y = Math.floor(i / 3) * 140;
+    card.interactive = true;
+    card.cursor = 'pointer';
+    card.back = test1[Math.floor(Math.random() * test1.length)];
+
+    
+
+    if (pairs === 2){
+        console.log('you win!')
+        console.log(pairs)
+        card.interactive = false;
+    } else {
+        card
+            .on('pointerdown', onButtonDown)
+            .on('pointerup', onButtonUp)
+    }
+    cardContainer.addChild(card);
+    container.addChild(cardContainer);
 }
 
 container.x = app.screen.width / 2;
@@ -71,54 +89,111 @@ container.pivot.y = container.height / 3;
 
 
 function onButtonDown() {
-
-  if (count == 2){
-    let test = compare(cards)
-    this.interactive = false;
-    if (test){
-      cards.length = 0;
-      count = 0;
-      this.isdown = true;
-      this.texture = slotTextures[Math.floor(Math.random() * slotTextures.length)];
-      this.alpha = 1;
-      count = count + 1;
-      cards.push(this.texture);
-    }
-  } else {
-    if (cards.length < 2){
-      this.isdown = true;
-      let aaa = this.texture = slotTextures[Math.floor(Math.random() * slotTextures.length)];
-      this.alpha = 1;
-      count = count + 1;
-      cards.push(this.texture);
-    }else {
-      for (let i = 0; i < cards.length; i++){
-        cards[i].baseTexture.cacheId = 'assets/card.png'
-      }
+    if (pairs == 2) {
+        this.interactive = false
+    } else {
+        if (cards.length < 2){
+            names.push(this)
+            console.log(names)
+            this.isdown = true;
+            switching(this);
+            this.interactive = true;
+            this.alpha = 1;
+            count = count + 1;
+            console.log('count:' + count)
+        }else{
+            this.isdown = false;
+            this.interactive = false;
+            count = 0;
+        }
     }
     
-    console.log(cards)
-    
-    // console.log(aaa)
-    // names.push(aaa)
-  }
-  //console.log(cards)
 }
 
 function onButtonUp(){
-  this.isdown = false;
-  this.interactive = false;
+    if (count == 2){
+        let llll = compare(cards);
+        
+        if (llll){
+            console.log('yes')
+            this.interactive = false
+            
+            //cards.interactive = false
+            cards.length = 0;
+            names.length = 0;
+            pairs += 1;
+            count = 0;
+            //this.interactive = false;
+            console.log('pairs: '+ pairs)
+        } else{
+            this.isdown = false;
+            this.interactive = true;
+        }
+    }
+    
+}    
+
+function switching(sm){
+    let kkk = 0;
+    let pairsMatch = 0;
+    //if (pairsMatch)
+    switch (sm.back){
+        case 'dimond':
+            sm.cardColor = 'dimond';
+            sm.texture = slotTextures[0];
+            cards.push(sm.cardColor)
+            //sm.interactive = false;
+            console.log(cards)
+            kkk += 1
+            break;
+        case 'spades':
+            sm.cardColor = 'spades';
+            sm.texture = slotTextures[1];
+            cards.push(sm.cardColor)
+            //sm.interactive = false;
+            console.log(cards)
+            break;
+        case 'hearts':
+            sm.cardColor = 'hearts';
+            sm.texture = slotTextures[2];
+            cards.push(sm.cardColor)
+            //sm.interactive = false;
+            console.log(cards)
+            break;
+        case 'clubs':
+            sm.cardColor = 'clubs';
+            sm.texture = slotTextures[3];
+            cards.push(sm.cardColor)
+            //sm.interactive = false;
+            console.log(cards)
+            break;
+    }
 }
 
+
+
 function compare(mas){
-  for (let i = 0; i < mas.length; i++){
-    if (mas[i].baseTexture.cacheId == mas[i+1].baseTexture.cacheId){
-      console.log('new pair')
-      pairs = 1;
-      return true;
-    } else 
-      mas.length = 0;
-      console.log('fall')
-      return false
-  }
+    for (let i = 0; i < mas.length; i++){
+        if (mas[i] === mas[i+1]){
+            console.log('new pair')
+            // mas[i].interactive = false
+            names.length = 0
+            return true;
+        } else {
+            for (let i = 0; i < names.length; i++){
+                names[i].texture = textureCard;
+                
+                count = 0;
+            }
+            console.log('cards:')
+            console.log(names)
+            console.log('cards:')
+            console.log(cards)
+            names.length = 0
+            cards.length = 0
+            console.log('fall')
+            return false
+        }
+            
+    }
 }
