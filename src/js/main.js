@@ -29,6 +29,8 @@ let test1 = [
     'clubs'
 ];
 
+let pairsCount = 0;
+
 back.width = app.screen.width;
 back.height = app.screen.height;
 app.stage.addChild(back);
@@ -115,6 +117,13 @@ function onButtonUp(){
             names.length = 0;
             count = 0;
             console.log('pairs: '+ pairs)
+
+            pairsCount++;
+            if (pairsCount === 2) {
+                console.log('finish');
+                let finishScreen = new PIXI.Graphics().beginFill(0xff0000).drawRect(-1000, -1000, 2000, 2000);
+                app.stage.addChild(finishScreen);
+            }
         } else{
             for (let i = 0; i < names.length; i++){
                 names[i].islock = false
