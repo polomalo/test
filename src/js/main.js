@@ -119,7 +119,7 @@ for (let i = 0; i < 6; i++) {
     console.log(card.back)
     card
         .on('pointerdown', onButtonDown)
-        .on('pointerup', onButtonUp)
+    //.on('pointerup', onButtonUp)
     cardContainer.addChild(card);
     container.addChild(cardContainer);
 }
@@ -133,29 +133,86 @@ container.pivot.y = container.height / 4;
 let timer
 
 function onButtonDown() {
-    if (this.islock){
+    console.log('buttonDown', this);
+    console.log('names', names, names.length);
+
+    if (this.islock || names.length > 1) {
         return
-    } else{
-        //tl.fromTo(this, {width: 170}, {width: 0})
-        if (cards.length < 2){
-            
-            names.push(this)
-            tl.fromTo(this, {width: 170}, {width: 0, duration: 0.2})
-            setTimeout(() => {
-                if (this.front) {
-                    switching(this)
-                    this.front = false
-                    tl.fromTo(this, {width: 0}, {width: 170, duration: 0.2})
-                    
-                }
-            }, 400)
-            this.interactive = true
-            console.log(this)
-            count++;
-            console.log('count: ' + count)
-        }else{
-            count = 0;
+    }
+
+
+    //console.log(this);
+
+    names.push(this);
+    console.log(names);
+
+    gsap.fromTo(this, {width: 170}, {width: 0, duration: 0.2}).eventCallback("onComplete", () => {
+        console.log('callback');
+        if (this.front) {
+            switching(this)
+            this.front = false
+            tl.fromTo(this, {width: 0}, {width: 170, duration: 0.2})
+
         }
+
+        if (names.length === 2) {
+            if (names[0].cardColor === names[1].cardColor) {
+                console.log('same');
+                names[0].islock = true;
+                names[1].islock = true;
+                names = [];
+                cards = [];
+                pairsCount++;
+                if (pairsCount === 2) {
+                    setTimeout(() => {
+                        console.log('finish');
+                        let finishScreen = new PIXI.Graphics().beginFill(0xff0000).drawRect(-1000, -1000, 2000, 2000);
+                        app.stage.addChild(finishScreen);
+                    }, 1000);
+
+                }
+            } else {
+                console.log('different')
+                setTimeout(() => {
+                    names[0].islock = false
+                    names[0].front = true
+                    names[0].texture = textureCard;
+
+                    names[1].islock = false
+                    names[1].front = true
+                    names[1].texture = textureCard;
+
+                    names = [];
+                    cards = [];
+                }, 1000);
+
+            }
+        }
+
+    }, ['width']);
+    count++;
+
+
+    return;
+    //tl.fromTo(this, {width: 170}, {width: 0})
+    if (cards.length < 2) {
+
+
+        names.push(this)
+        tl.fromTo(this, {width: 170}, {width: 0, duration: 0.2})
+        setTimeout(() => {
+            if (this.front) {
+                switching(this)
+                this.front = false
+                tl.fromTo(this, {width: 0}, {width: 170, duration: 0.2})
+
+            }
+        }, 400)
+        this.interactive = true
+        count++;
+    } else {
+        count = 0;
+        return;
     }
         
 }
