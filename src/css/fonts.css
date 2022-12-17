@@ -1,0 +1,19 @@
+@font-face {
+    font-family: 'Lyonesse';
+    src: local('Lyonesse'),
+        url('../fonts/Lyonesse.woff2') format('woff2'),
+        url('../fonts/Lyonesse.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Creolia';
+    src: local('Creolia Bold'), local('Creolia'),
+        url('../fonts/Creolia.woff2') format('woff2'),
+        url('../fonts/Creolia.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+

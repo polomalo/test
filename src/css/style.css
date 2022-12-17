@@ -6,12 +6,13 @@ body{
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background: transparent;
+    background: gray;
 }
 
 .container{
     width: 1200px;
     margin: 0 auto;
+    position: relative;
 }
 
 .row{
@@ -23,6 +24,7 @@ body{
 }
 
 .header__devices{
+    width: 200px;
     margin: 20px auto;
 }
 
@@ -40,7 +42,8 @@ body{
 }
 
 #scene {
-    margin: 200px;
+    display: block;
+    margin: 100px auto;
     width: 318px;
     height: 566px;
 }
