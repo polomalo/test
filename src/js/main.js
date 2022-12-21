@@ -1,12 +1,8 @@
 import * as PIXI from 'pixi.js'
 import { gsap } from "gsap";
+import { CSSPlugin } from 'gsap/CSSPlugin';
 
-// let font = new FontFaceSetLoadEvent('Lyonesse',{})
-// font.load.then(() =>{
-    
-// }, () => {
-//     console.log('Unable to load required font!')
-// })
+gsap.registerPlugin(CSSPlugin);
 
 let app = new PIXI.Application({
     view: document.querySelector('#scene'),
@@ -14,25 +10,26 @@ let app = new PIXI.Application({
     antialias: true
 });
 
-let count = 0;
 let pairsCount = 0
 
-let textureCard = PIXI.Texture.from('assets/card.png');
+let textureCard = PIXI.Texture.from('assets/cards/card.png');
 let background = PIXI.Texture.from('assets/back.png');
 let back = new PIXI.Sprite(background);
 let cards = [];
 let names = []
 let slotTextures = [
-    PIXI.Texture.from('assets/dimond.png'),
-    PIXI.Texture.from('assets/spades.png'),
-    PIXI.Texture.from('assets/hearts.png'),
-    PIXI.Texture.from('assets/clubs.png'),
+    PIXI.Texture.from('assets/cards/dimond.png'),
+    PIXI.Texture.from('assets/cards/spades.png'),
+    PIXI.Texture.from('assets/cards/hearts.png'),
+    //PIXI.Texture.from('assets/cards/clubs.png'),
 ];
+let buttonTexture = PIXI.Texture.from('assets/button.png');
+let button = new PIXI.Sprite(buttonTexture);
 let textureColor = [
     'dimond',
     'spades',
     'hearts',
-    'clubs'
+    //'clubs'
 ];
 
 
@@ -45,7 +42,6 @@ let top = new PIXI.Graphics();
 top.beginFill(0xFFFFFF);
 top.drawRect(0, 0, app.screen.width, 70);
 top.endFill();
-//app.stage.addChild(top);
 
 
 let firstStyle = new PIXI.TextStyle({
@@ -73,129 +69,253 @@ app.stage.addChild(header)
 
 
 let firstLine = new PIXI.Container();
-let firstWord= new PIXI.Text('PLAY 2 TIMES A DAY!',firstStyle);
+let firstWord = new PIXI.Text('PLAY 2 TIMES A DAY!',firstStyle);
 firstLine.x = 0
 firstLine.y = 10
 firstLine.width = app.screen.width
-firstWord.width = 400
-console.log(firstWord.width)
 firstWord.x = Math.round((header.width - firstWord.width) / 2)
 firstLine.addChild(firstWord)
-app.stage.addChild(firstLine)
+header.addChild(firstLine)
 
 
 let secondLine = new PIXI.Container();
 let secondWord = new PIXI.Text('TO KEEP YOUR BRAIN HEALTHY', secondStyle);
 secondLine.x = 0
 secondLine.y = 35
-secondWord.width = 700
 secondLine.x = Math.round((header.width - secondWord.width) / 2)
 secondLine.addChild(secondWord)
-app.stage.addChild(secondLine)
+header.addChild(secondLine)
 
-gsap.fromTo(firstLine, {x: -600}, {x: 0, duration: 1, delay: 1});
+gsap.fromTo(header, {y: -100}, {y: 0, duration: 1, delay: 1});
 
+
+let allCards = []
 
 let container = new PIXI.Container();
 app.stage.addChild(container);
-let keks = []
+let filter = new PIXI.filters.ColorMatrixFilter();
+
+let noteContainer = new PIXI.Container();
+let tapNoteShape = new PIXI.Graphics();
+noteContainer.width = 300;
+noteContainer.height = 300;
+noteContainer.x = 50;
+noteContainer.y = 75;
+tapNoteShape.beginFill(0xCFBD8F);
+tapNoteShape.drawRoundedRect(0, 0, 150, 60, 30);
+tapNoteShape.moveTo(90, 60);
+tapNoteShape.lineTo(120, 60);
+tapNoteShape.lineTo(105, 75);
+tapNoteShape.lineTo(90, 60);
+tapNoteShape.closePath();
+tapNoteShape.endFill();
+
+let tapTextStyle = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontWeight: 900,
+    fontSize: 15,
+    fill: 0XBB3131,
+    dropShadow: true,
+    dropShadowColor: '#000000',
+    dropShadowBlur: 3,
+    dropShadowAngle: Math.PI / 4,
+    dropShadowDistance: 4,
+})
+
+let tapText = new PIXI.Text('TAP TO MATCH\nPAIRS!', tapTextStyle)
+tapText.x = 15;
+tapText.y = 11;
+tapNoteShape.addChild(tapText)
+noteContainer.addChild(tapNoteShape);
+app.stage.addChild(noteContainer)
+noteContainer.visible = false
 
 for (let i = 0; i < 6; i++) {
     let cardContainer = new PIXI.Container();
-    cardContainer.width = 170;
-    cardContainer.height = 130;
+    cardContainer.width = 110;
+    cardContainer.height = 160;
     cardContainer.x = (i % 3) * 200;
-    cardContainer.y = Math.floor(i / 3) * 120;
+    cardContainer.y = Math.floor(i / 3) * 180;
     let card = new PIXI.Sprite(textureCard);
-    card.width = 170;
-    card.height = 100;
+    
     card.anchor.set(0.5);
     card.interactive = true;
     card.islock = false;
     card.cursor = 'pointer';
-    keks.push(card)
     card.front = true
     card.back = textureColor[Math.floor(Math.random() * textureColor.length)];
-    console.log(card.back)
+    allCards.push(card)
     card
         .on('pointerdown', onButtonDown)
-        .on('pointerup', onButtonUp)
+    
     cardContainer.addChild(card);
+    
+    if (i === 0) {
+        card.interactive = true
+    } else {
+        card.interactive = false
+        
+    }
+    if (i < 3) {
+        gsap.fromTo(cardContainer, {x: 1000}, {x: 0 + i * 200, duration: 1, ease: "back.out(1.2)", delay: 1 + i*0.1})
+    }
+    if (i >= 3) {
+        gsap.fromTo(cardContainer, {x: -1000}, {x: 0 + (i - 3) * 200, duration: 1, ease: "back.out(1.2)", delay: 1 + i*0.1}).eventCallback('onComplete', () => {
+            
+            for (let i = 1; i < allCards.length; i++){
+                allCards[i].interactive = false
+                let noneActive = new PIXI.Graphics();
+                noneActive.beginFill(0x000000);
+                noneActive.drawRect(-55, -80, 110, 160);
+                noneActive.endFill();
+                noneActive.alpha = 0;
+                allCards[i].addChild(noneActive)
+                gsap.to(noneActive, {alpha: 0.2, duration: 1} )
+            }
+            noteContainer.alpha = 0
+            gsap.to(noteContainer, {alpha: 1, duration: 1, visible: true})
+            gsap.to(noteContainer, {alpha: 0.6, repeat: -1, yoyo: true, duration: 0.6})
+            gsap.to(filter, {greyscale: 0.3, duration: 2})
+            back.filters = [filter]
+            
+        })
+    }
     container.addChild(cardContainer);
 }
 
-let tl = gsap.timeline()
-
 container.x = app.screen.width / 2;
 container.y = app.screen.height / 2;
-container.pivot.x = container.width / 3;
-container.pivot.y = container.height / 4;
-let timer
+container.pivot.x = container.width / 2;
+container.pivot.y = container.height / 3;
 
 function onButtonDown() {
-    if (this.islock){
+    if (this.islock || names.length > 1){
         return
-    } else{
-        //tl.fromTo(this, {width: 170}, {width: 0})
-        if (cards.length < 2){
-            
-            names.push(this)
-            tl.fromTo(this, {width: 170}, {width: 0, duration: 0.2})
-            setTimeout(() => {
-                if (this.front) {
-                    switching(this)
-                    this.front = false
-                    tl.fromTo(this, {width: 0}, {width: 170, duration: 0.2})
-                    
-                }
-            }, 400)
-            this.interactive = true
-            console.log(this)
-            count++;
-            console.log('count: ' + count)
-        }else{
-            count = 0;
-        }
-    }
-        
-}
+    } 
+    
+    container.interactiveChildren = false
+    names.push(this)
 
-function onButtonUp(){
-    if (count == 2){
-        setTimeout(() => {
-            let llll = compare(cards);
-            if (llll){
-                //tl.fromTo(sm, {width: 0}, {width: 170, duration: 2})
-    
-                cards.length = 0;
-                names.length = 0;
-                count = 0;
+    gsap.fromTo(this, {width: 110}, {width: 0, duration: 0.2}).eventCallback('onComplete', () => {
+        console.log('callback')
+        if (this.front){
+            switching(this)
+            this.front = false
+            allCards.forEach((item) => {
+                item.interactive = true
+            })
+            gsap.fromTo(this, {width: 0}, {width: 110, duration: 0.2}).eventCallback('onComplete', () => {
+                container.interactiveChildren = true
+                filter.enabled = false
+                noteContainer.visible = false
+                allCards.forEach((item) => {
+                    item.children.forEach((item) => {
+                        gsap.to(item, {alpha: 0, duration: 1})
+                    })
+                })
+            })
+        }
+
+        if (names.length === 2) {
+            if (names[0].cardColor === names[1].cardColor){
+                console.log('same');
+                names[0].islock = true;
+                names.forEach((elem) => {
+                    console.log(elem)
+                    gsap.to(elem, {rotation: 0.1, ease: 'power1.in'});
+                    
+                })
+                names = [];
+                cards = [];
                 pairsCount++;
-                console.log(pairsCount)
-                if (pairsCount === 2) {
-                    console.log('finish');
-                    let finishScreen = new PIXI.Graphics().beginFill(0xff0000).drawRect(-1000, -1000, 2000, 2000);
-                    app.stage.addChild(finishScreen);
+                if (pairsCount === 2){
+                    setTimeout(() => {
+                        allCards.forEach((item, i) => {
+                            if (i < 3) {
+                                gsap.to(item, {x: 1000, duration: 2, ease: "back.inOut(3)"})
+                            }
+                            if (i >= 3) {
+                                gsap.to(item, {x: -1000, duration: 2, ease: "back.inOut(3)"}).eventCallback('onComplete', () => {
+                                    console.log('finish');
+                                    back.width = app.screen.width;
+                                    back.height = app.screen.height;
+                                    back.alpha = 0;
+                                    gsap.to(back, {alpha: 1, duration: 1})
+                                    app.stage.addChild(back);
+                                    let winContainer = new PIXI.Container();
+                                    winContainer.width = 400;
+                                    winContainer.height = app.screen.height;
+                                    winContainer.x = Math.round((back.width - 400) / 2)
+                                    let winTextStyle = new PIXI.TextStyle({
+                                        fontFamily: 'Creolia',
+                                        fontWeight: 900,
+                                        fontSize: 40,
+                                        fill: 0XC2BEB4,
+                                        stroke: '#444444',
+                                        strokeThickness: 2,
+                                    })
+                                    let winText = new PIXI.Text('YOU WIN!', winTextStyle);
+                                    winText.x = Math.round((400 - winText.width) / 2)
+                                    winText.y = Math.round((app.screen.height - winText.height) / 6)
+                                    winContainer.addChild(winText)
+
+                                    let prizeBoxTexture = new PIXI.Texture.from('assets/prizebox.png')
+
+                                    let prizeBox = new PIXI.Sprite(prizeBoxTexture);
+                                    prizeBox.anchor.set(0.5)
+
+                                    console.log(prizeBox.width)
+
+                                    prizeBox.x = Math.round((400 - prizeBox.width) / 2)
+                                    prizeBox.y = Math.round((app.screen.height - prizeBox.height) / 2)
+
+                                    winContainer.addChild(prizeBox)
+
+                                    let buttonTStyle = new PIXI.TextStyle({
+                                        fontFamily: 'Creolia',
+                                        fontWeight: 900,
+                                        fontSize: 20,
+                                        fill: 0XC2BEB4,
+                                        stroke: '#444444',
+                                        strokeThickness: 2,
+                                    })
+                                    let buttonT = new PIXI.Text('INSTALL NOW', buttonTStyle)
+                                    buttonT.x = Math.round((180 - buttonT.width) / 2)
+                                    buttonT.y = Math.round((50 - buttonT.height) / 2)
+                                    button.y = app.stage.height - 100
+                                    let heights = app.stage.height - 110
+                                    gsap.to(button, {y: heights, repeat: -1, yoyo: true, duration: 0.6})
+                                    app.stage.addChild(buttonContainer);
+
+                                    app.stage.addChild(winContainer)
+                                    winContainer.alpha = 0;
+                                    gsap.to(winContainer, {alpha: 1, duration: 1})
+                                })
+                            }
+                        })
+                        
+                    }, 1000)
                 }
-            } else{
-                
-                for (let i = 0; i < names.length; i++){
-                    names[i].islock = false
-                    names[i].front = true
-                    
-                    names[i].texture = textureCard;
-                    
-                    
-                }
-                
-                console.log(names)
-                names.length = 0
+            } else {
+                console.log('different')
+                setTimeout(() => {
+                    names.forEach((elem) => {
+                        elem.islock = false;
+                        elem.front = true;
+                        gsap.fromTo(elem, {width: 110}, {width: 0, duration: 0.2}).eventCallback('onComplete', () => {
+                            elem.texture = textureCard
+                            gsap.fromTo(elem, {width: 0}, {width: 110, duration: 0.2})
+                        })
+                        
+                    })
+                    names = [];
+                    cards = [];
+                }, 1000)
             }
-        }, 1000)
-        
-    }
-    
-}    
+        }
+    }, ['width'])
+    return;
+}
 
 function switching(sm){
     switch (sm.back){
@@ -204,10 +324,6 @@ function switching(sm){
             sm.texture = slotTextures[0];
             sm.front = false
             sm.islock = true
-            //sm.interactive = false
-            //container.interactive = false
-            //tl.fromTo(sm, {width: 0}, {width: 170})
-            // tl.fromTo(sm, {alpha: 0}, {alpha: 1})
             cards.push(sm.cardColor)
             break;
         case 'spades':
@@ -215,10 +331,6 @@ function switching(sm){
             sm.texture = slotTextures[1];
             sm.front = false
             sm.islock = true
-            //sm.interactive = false
-            //container.interactive = false
-            //tl.fromTo(sm, {width: 0}, {width: 170})
-            // tl.fromTo(sm, {alpha: 0}, {alpha: 1})
             cards.push(sm.cardColor)
             break;
         case 'hearts':
@@ -226,10 +338,6 @@ function switching(sm){
             sm.texture = slotTextures[2];
             sm.front = false
             sm.islock = true
-            //sm.interactive = false
-           // container.interactive = false
-            //tl.fromTo(sm, {width: 0}, {width: 170})
-            // tl.fromTo(sm, {alpha: 0}, {alpha: 1})
             cards.push(sm.cardColor)
             break;
         case 'clubs':
@@ -237,28 +345,40 @@ function switching(sm){
             sm.texture = slotTextures[3];
             sm.front = false
             sm.islock = true
-            //sm.interactive = false
-            //container.interactive = false
-            //tl.fromTo(sm, {width: 0}, {width: 170})
-            //tl.fromTo(sm, {alpha: 0}, {alpha: 1})
             cards.push(sm.cardColor)
             break;
     }
 }
 
-function compare(mas){
-    for (let i = 0; i < mas.length; i++){
-        if (mas[i] === mas[i+1]){
-            names.length = 0
-            return true;
-        } else {
-            
-            count = 0
-            cards.length = 0
-            console.log('fall')
-            return false
-        }
-            
-    }
-}
+let buttonContainer = new PIXI.Container();
+
+buttonContainer.width = 180;
+buttonContainer.height = 50;
+
+
+
+
+button.x = Math.round((app.stage.width - 180) / 2)
+button.y = app.stage.height - 70
+buttonContainer.interactive = true;
+buttonContainer.cursor = 'pointer';
+
+let buttonTextStyle = new PIXI.TextStyle({
+    fontFamily: 'Creolia',
+    fontWeight: 900,
+    fontSize: 20,
+    fill: 0XC2BEB4,
+    stroke: '#444444',
+    strokeThickness: 2,
+})
+let buttonText = new PIXI.Text('INSTALL NOW', buttonTextStyle)
+buttonText.x = Math.round((180 - buttonText.width) / 2)
+buttonText.y = Math.round((50 - buttonText.height) / 2)
+buttonContainer.alpha = 0;
+gsap.fromTo(buttonContainer, {y: 100}, {y: 0, duration: 1, delay: 1, alpha: 1})
+button.addChild(buttonText)
+buttonContainer.addChild(button)
+app.stage.addChild(buttonContainer);
+
+
 

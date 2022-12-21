@@ -41,9 +41,13 @@ body{
     
 }
 
-#scene {
+.main__window {
     display: block;
     margin: 100px auto;
-    width: 318px;
-    height: 566px;
+    width: 800px;
+    height: 600px;
+}
+
+#scene{
+    width: 100%;
 }
