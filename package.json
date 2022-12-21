@@ -1,13 +1,12 @@
 {
-  "name": "pixi-webpack-demo",
+  "name": "cardgame",
   "version": "1.0.0",
-  "description": "make pixi.js game with webpack",
   "main": "src/js/main.js",
   "keywords": [
     "pixi.js",
     "webpack"
   ],
-  "author": "yulijun",
+  "author": "Dmitry Kirkitsky",
   "license": "MIT",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack-dev-server --hot --config webpack.dev.js",
