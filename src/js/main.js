@@ -16,21 +16,25 @@ let textureCard = PIXI.Texture.from('assets/cards/card.png');
 let background = PIXI.Texture.from('assets/back.png');
 let back = new PIXI.Sprite(background);
 let cards = [];
-let names = []
+let names = [];
+let allCards = [];
 let slotTextures = [
     PIXI.Texture.from('assets/cards/dimond.png'),
     PIXI.Texture.from('assets/cards/spades.png'),
-    PIXI.Texture.from('assets/cards/hearts.png'),
-    //PIXI.Texture.from('assets/cards/clubs.png'),
+    PIXI.Texture.from('assets/cards/hearts.png')
 ];
 let buttonTexture = PIXI.Texture.from('assets/button.png');
 let button = new PIXI.Sprite(buttonTexture);
 let textureColor = [
     'dimond',
     'spades',
-    'hearts',
-    //'clubs'
+    'hearts'
 ];
+
+let dimond = 0,
+    spades = 0,
+    hearts = 0;
+
 
 
 
@@ -89,9 +93,13 @@ header.addChild(secondLine)
 gsap.fromTo(header, {y: -100}, {y: 0, duration: 1, delay: 1});
 
 
-let allCards = []
-
 let container = new PIXI.Container();
+container.x = app.screen.width / 4;
+container.y = app.screen.height / 2.5;
+
+// container.pivot.x = container.width / 2;
+// container.pivot.y = container.height / 3;
+console.log(container.width)
 app.stage.addChild(container);
 let filter = new PIXI.filters.ColorMatrixFilter();
 
@@ -134,35 +142,104 @@ for (let i = 0; i < 6; i++) {
     let cardContainer = new PIXI.Container();
     cardContainer.width = 110;
     cardContainer.height = 160;
-    cardContainer.x = (i % 3) * 200;
+    cardContainer.x = (i % 3) * 120;
     cardContainer.y = Math.floor(i / 3) * 180;
     let card = new PIXI.Sprite(textureCard);
     
     card.anchor.set(0.5);
-    card.interactive = true;
+    card.interactive = false;
     card.islock = false;
     card.cursor = 'pointer';
     card.front = true
-    card.back = textureColor[Math.floor(Math.random() * textureColor.length)];
+
+    if (dimond === 2){
+        textureColor.forEach((item, i, arr) => {
+            if (item === 'dimond'){
+                textureColor.splice(i, 1)
+            } else return
+        })
+    }
+    if (spades === 2){
+        textureColor.forEach((item, i, arr) => {
+            if (item === 'spades'){
+                textureColor.splice(i, 1)
+            } else return
+        })
+    }
+    if (hearts === 2){
+        textureColor.forEach((item, i, arr) => {
+            if (item === 'hearts'){
+                textureColor.splice(i, 1)
+            } else return
+        })
+    }
+    console.log(textureColor)
+    let cardColorBack = textureColor[Math.floor(Math.random() * textureColor.length)];
+    console.log(cardColorBack)
+    switch (cardColorBack){
+        case 'dimond':
+            dimond++;
+            card.back = cardColorBack;
+            break;
+        case 'spades':
+            spades++;
+            card.back = cardColorBack;
+            break;
+        case 'hearts':
+            hearts++;
+            card.back = cardColorBack;
+            break;
+    }
     allCards.push(card)
+    container.interactive = false;
     card
         .on('pointerdown', onButtonDown)
     
     cardContainer.addChild(card);
     
-    if (i === 0) {
-        card.interactive = true
-    } else {
-        card.interactive = false
-        
-    }
+    // if (i < 3) {
+    //     gsap.fromTo(allCards, {x: 1000}, {x: 0 + i * 200, duration: 1, ease: "back.out(1.2)", delay: 1 + i*0.1})
+    // }
+    // if (i >= 3) {
+    //     gsap.fromTo(allCards, {x: -1000}, {x: 0 + (i - 3) * 200, duration: 1, ease: "back.out(1.2)", delay: 1 + i*0.1}).eventCallback('onComplete', () => {
+            
+    //         for (let i = 1; i < allCards.length; i++){
+    //             allCards[0].interactive = true
+    //             allCards[i].interactive = false
+    //             let noneActive = new PIXI.Graphics();
+    //             noneActive.beginFill(0x000000);
+    //             noneActive.drawRect(-55, -80, 110, 160);
+    //             noneActive.endFill();
+    //             noneActive.alpha = 0;
+    //             allCards[i].addChild(noneActive)
+    //             gsap.to(noneActive, {alpha: 0.2, duration: 1} )
+                
+    //         }
+    //         console.log(container.width)
+    //         container.interactive = true;
+    //         noteContainer.alpha = 0
+            
+    //         gsap.to(noteContainer, {alpha: 1, duration: 1, visible: true})
+    //         gsap.to(noteContainer, {alpha: 0.6, repeat: -1, yoyo: true, duration: 0.6})
+    //         gsap.to(filter, {greyscale: 0.3, duration: 2})
+    //         back.filters = [filter]
+            
+    //     })
+    //     console.log(container.width)
+    // }
+    container.addChild(cardContainer);
+}
+console.log(textureColor)
+
+allCards.forEach((item,i) => {
+    
     if (i < 3) {
-        gsap.fromTo(cardContainer, {x: 1000}, {x: 0 + i * 200, duration: 1, ease: "back.out(1.2)", delay: 1 + i*0.1})
+        gsap.fromTo(item, {x: 1000}, {x: 0 + i * 80, duration: 1, ease: "back.out(1.2)", delay: 1 + i*0.1})
     }
     if (i >= 3) {
-        gsap.fromTo(cardContainer, {x: -1000}, {x: 0 + (i - 3) * 200, duration: 1, ease: "back.out(1.2)", delay: 1 + i*0.1}).eventCallback('onComplete', () => {
-            
+        gsap.fromTo(item, {x: -1000}, {x: 0 + (i - 3) * 80, duration: 1, ease: "back.out(1.2)", delay: 1 + i*0.1}).eventCallback('onComplete', () => {
             for (let i = 1; i < allCards.length; i++){
+                allCards[0].interactive = false
                 allCards[i].interactive = false
                 let noneActive = new PIXI.Graphics();
                 noneActive.beginFill(0x000000);
@@ -171,25 +248,26 @@ for (let i = 0; i < 6; i++) {
                 noneActive.alpha = 0;
                 allCards[i].addChild(noneActive)
                 gsap.to(noneActive, {alpha: 0.2, duration: 1} )
+                
             }
-            noteContainer.alpha = 0
+            container.interactive = true;
+            
+            
             gsap.to(noteContainer, {alpha: 1, duration: 1, visible: true})
             gsap.to(noteContainer, {alpha: 0.6, repeat: -1, yoyo: true, duration: 0.6})
-            gsap.to(filter, {greyscale: 0.3, duration: 2})
+            gsap.to(filter, {greyscale: 0.3, duration: 2}).eventCallback('onComplete',() => {
+                allCards[0].interactive = true
+            })
             back.filters = [filter]
             
         })
     }
-    container.addChild(cardContainer);
-}
 
-container.x = app.screen.width / 2;
-container.y = app.screen.height / 2;
-container.pivot.x = container.width / 2;
-container.pivot.y = container.height / 3;
+    
+})
 
 function onButtonDown() {
-    if (this.islock || names.length > 1){
+    if (this.islock || names.length > 1 || pairsCount === 2){
         return
     } 
     
@@ -231,6 +309,7 @@ function onButtonDown() {
                 if (pairsCount === 2){
                     setTimeout(() => {
                         allCards.forEach((item, i) => {
+                            
                             if (i < 3) {
                                 gsap.to(item, {x: 1000, duration: 2, ease: "back.inOut(3)"})
                             }
@@ -340,13 +419,6 @@ function switching(sm){
             sm.islock = true
             cards.push(sm.cardColor)
             break;
-        case 'clubs':
-            sm.cardColor = 'clubs';
-            sm.texture = slotTextures[3];
-            sm.front = false
-            sm.islock = true
-            cards.push(sm.cardColor)
-            break;
     }
 }
 
@@ -354,9 +426,6 @@ let buttonContainer = new PIXI.Container();
 
 buttonContainer.width = 180;
 buttonContainer.height = 50;
-
-
-
 
 button.x = Math.round((app.stage.width - 180) / 2)
 button.y = app.stage.height - 70
@@ -379,6 +448,3 @@ gsap.fromTo(buttonContainer, {y: 100}, {y: 0, duration: 1, delay: 1, alpha: 1})
 button.addChild(buttonText)
 buttonContainer.addChild(button)
 app.stage.addChild(buttonContainer);
-
-
-
