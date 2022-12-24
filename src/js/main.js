@@ -1,8 +1,8 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js';
 import { gsap } from "gsap";
-import { CSSPlugin } from 'gsap/CSSPlugin';
+import { Howl } from 'howler';
+import { Timeline } from 'gsap/gsap-core';
 
-gsap.registerPlugin(CSSPlugin);
 
 let app = new PIXI.Application({
     view: document.querySelector('#scene'),
@@ -35,12 +35,11 @@ let dimond = 0,
     spades = 0,
     hearts = 0;
 
-
-
-
 back.width = app.screen.width;
 back.height = app.screen.height;
 app.stage.addChild(back);
+
+
 
 let top = new PIXI.Graphics();
 top.beginFill(0xFFFFFF);
@@ -62,6 +61,16 @@ let secondStyle = new PIXI.TextStyle({
     fill: 0XBB3131
     
 })
+let backMusic = new Howl({
+    src: ['../assets/sounds/backmusic.mp3'],
+    volume: 0.2,
+    autoplay: true,
+    loop: true
+});
+
+
+
+backMusic.play()
 
 let header = new PIXI.Container();
 header.x = 0
@@ -196,37 +205,6 @@ for (let i = 0; i < 6; i++) {
         .on('pointerdown', onButtonDown)
     
     cardContainer.addChild(card);
-    
-    // if (i < 3) {
-    //     gsap.fromTo(allCards, {x: 1000}, {x: 0 + i * 200, duration: 1, ease: "back.out(1.2)", delay: 1 + i*0.1})
-    // }
-    // if (i >= 3) {
-    //     gsap.fromTo(allCards, {x: -1000}, {x: 0 + (i - 3) * 200, duration: 1, ease: "back.out(1.2)", delay: 1 + i*0.1}).eventCallback('onComplete', () => {
-            
-    //         for (let i = 1; i < allCards.length; i++){
-    //             allCards[0].interactive = true
-    //             allCards[i].interactive = false
-    //             let noneActive = new PIXI.Graphics();
-    //             noneActive.beginFill(0x000000);
-    //             noneActive.drawRect(-55, -80, 110, 160);
-    //             noneActive.endFill();
-    //             noneActive.alpha = 0;
-    //             allCards[i].addChild(noneActive)
-    //             gsap.to(noneActive, {alpha: 0.2, duration: 1} )
-                
-    //         }
-    //         console.log(container.width)
-    //         container.interactive = true;
-    //         noteContainer.alpha = 0
-            
-    //         gsap.to(noteContainer, {alpha: 1, duration: 1, visible: true})
-    //         gsap.to(noteContainer, {alpha: 0.6, repeat: -1, yoyo: true, duration: 0.6})
-    //         gsap.to(filter, {greyscale: 0.3, duration: 2})
-    //         back.filters = [filter]
-            
-    //     })
-    //     console.log(container.width)
-    // }
     container.addChild(cardContainer);
 }
 console.log(textureColor)
@@ -267,6 +245,11 @@ allCards.forEach((item,i) => {
 })
 
 function onButtonDown() {
+    let click = new Howl({
+        src: ['../assets/sounds/click.wav'],
+        volume: 0.5,
+    });
+
     if (this.islock || names.length > 1 || pairsCount === 2){
         return
     } 
@@ -277,6 +260,7 @@ function onButtonDown() {
     gsap.fromTo(this, {width: 110}, {width: 0, duration: 0.2}).eventCallback('onComplete', () => {
         console.log('callback')
         if (this.front){
+            click.play();
             switching(this)
             this.front = false
             allCards.forEach((item) => {
@@ -291,11 +275,17 @@ function onButtonDown() {
                         gsap.to(item, {alpha: 0, duration: 1})
                     })
                 })
+                
             })
         }
 
         if (names.length === 2) {
             if (names[0].cardColor === names[1].cardColor){
+                let match = new Howl({
+                    src: ['../assets/sounds/match.wav'],
+                    volume: 0.5
+                });
+                match.play();
                 console.log('same');
                 names[0].islock = true;
                 names.forEach((elem) => {
@@ -309,75 +299,125 @@ function onButtonDown() {
                 if (pairsCount === 2){
                     setTimeout(() => {
                         allCards.forEach((item, i) => {
-                            
                             if (i < 3) {
                                 gsap.to(item, {x: 1000, duration: 2, ease: "back.inOut(3)"})
                             }
                             if (i >= 3) {
                                 gsap.to(item, {x: -1000, duration: 2, ease: "back.inOut(3)"}).eventCallback('onComplete', () => {
                                     console.log('finish');
-                                    back.width = app.screen.width;
-                                    back.height = app.screen.height;
-                                    back.alpha = 0;
-                                    gsap.to(back, {alpha: 1, duration: 1})
-                                    app.stage.addChild(back);
-                                    let winContainer = new PIXI.Container();
-                                    winContainer.width = 400;
-                                    winContainer.height = app.screen.height;
-                                    winContainer.x = Math.round((back.width - 400) / 2)
-                                    let winTextStyle = new PIXI.TextStyle({
-                                        fontFamily: 'Creolia',
-                                        fontWeight: 900,
-                                        fontSize: 40,
-                                        fill: 0XC2BEB4,
-                                        stroke: '#444444',
-                                        strokeThickness: 2,
+                                    let win = new Howl({
+                                        src: ['../assets/sounds/win.wav'],
+                                        volume: 0.5
                                     })
-                                    let winText = new PIXI.Text('YOU WIN!', winTextStyle);
-                                    winText.x = Math.round((400 - winText.width) / 2)
-                                    winText.y = Math.round((app.screen.height - winText.height) / 6)
-                                    winContainer.addChild(winText)
-
-                                    let prizeBoxTexture = new PIXI.Texture.from('assets/prizebox.png')
-
-                                    let prizeBox = new PIXI.Sprite(prizeBoxTexture);
-                                    prizeBox.anchor.set(0.5)
-
-                                    console.log(prizeBox.width)
-
-                                    prizeBox.x = Math.round((400 - prizeBox.width) / 2)
-                                    prizeBox.y = Math.round((app.screen.height - prizeBox.height) / 2)
-
-                                    winContainer.addChild(prizeBox)
-
-                                    let buttonTStyle = new PIXI.TextStyle({
-                                        fontFamily: 'Creolia',
-                                        fontWeight: 900,
-                                        fontSize: 20,
-                                        fill: 0XC2BEB4,
-                                        stroke: '#444444',
-                                        strokeThickness: 2,
-                                    })
-                                    let buttonT = new PIXI.Text('INSTALL NOW', buttonTStyle)
-                                    buttonT.x = Math.round((180 - buttonT.width) / 2)
-                                    buttonT.y = Math.round((50 - buttonT.height) / 2)
-                                    button.y = app.stage.height - 100
-                                    let heights = app.stage.height - 110
-                                    gsap.to(button, {y: heights, repeat: -1, yoyo: true, duration: 0.6})
-                                    app.stage.addChild(buttonContainer);
-
-                                    app.stage.addChild(winContainer)
-                                    winContainer.alpha = 0;
-                                    gsap.to(winContainer, {alpha: 1, duration: 1})
+                                    backMusic.stop();
+                                    win.play();
                                 })
                             }
+                            
                         })
+                        setTimeout(() => {
+                            back.width = app.screen.width;
+                            back.height = app.screen.height;
+                            back.alpha = 0;
+                            gsap.to(back, {alpha: 1, duration: 1})
+                            app.stage.addChild(back);
+                            let winContainer = new PIXI.Container();
+                            winContainer.width = 400;
+                            winContainer.alpha = 0;
+                            winContainer.height = app.screen.height;
+                            winContainer.x = Math.round((back.width - 400) / 2)
+                            let winTextStyle = new PIXI.TextStyle({
+                                fontFamily: 'Creolia',
+                                fontWeight: 900,
+                                fontSize: 40,
+                                fill: 0XC2BEB4,
+                                stroke: '#444444',
+                                strokeThickness: 2,
+                            })
+                            let winText = new PIXI.Text('YOU WIN!', winTextStyle);
+                            winText.x = Math.round((400 - winText.width) / 2)
+                            winText.y = Math.round((app.screen.height - winText.height) / 6)
+                            winContainer.addChild(winText)
+
+                            let prizeBoxTexture = new PIXI.Texture.from('assets/prizebox.png')
+
+                            let prizeBox = new PIXI.Sprite(prizeBoxTexture);
+                            prizeBox.anchor.set(0.5)
+                            prizeBox.x = 0
+
+                            let starTexture = PIXI.Texture.from('assets/star1.png');
+
+                            let particleContainer = new PIXI.Container();
+                            particleContainer.x = Math.round((400 - prizeBox.width) / 2);
+                            particleContainer.y = Math.round((app.screen.height - prizeBox.height) / 2)
+                            
+                            let stars = []
+                            for (let i = 0; i < 400; i++){
+                                let star = new PIXI.Sprite(starTexture);
+                                star.x = 0;
+                                star.y = 0;
+                                star.anchor.set(0.5);
+                                star.width = 0;
+                                star.height = 0;
+                                particleContainer.addChild(star)
+                                stars.push(star);
+                            }
+                            setInterval(() => {
+                                for (let k = 0; k < 400; k++){
+                                    let star = stars[k];
+                                    let size = Math.random() * 30;
+                                    let deg = Math.random() * Math.PI * 2;
+                                    let distance = Math.random() * 150 + 1;
+                                    gsap.to(star, { width: size,
+                                                    height: size,
+                                                    x: Math.cos(deg) * distance,
+                                                    y: Math.sin(deg) * distance,
+                                                    duration: 1}).eventCallback('onComplete', () => {
+                                                        star.x = 0;
+                                                        star.y = 0;
+                                                    });
+                                    setTimeout(() => {
+                                        gsap.to(star, {width: 0, height: 0, duration: 1})
+                                    }, 1500)
+                                }
+                            }, 1000)
+
+
+                            particleContainer.addChild(prizeBox);
+                            winContainer.addChild(particleContainer);
+
+                            let buttonTStyle = new PIXI.TextStyle({
+                                fontFamily: 'Creolia',
+                                fontWeight: 900,
+                                fontSize: 20,
+                                fill: 0XC2BEB4,
+                                stroke: '#444444',
+                                strokeThickness: 2,
+                            })
+                            let buttonT = new PIXI.Text('INSTALL NOW', buttonTStyle)
+                            buttonT.x = Math.round((180 - buttonT.width) / 2)
+                            buttonT.y = Math.round((50 - buttonT.height) / 2)
+                            button.y = app.stage.height - 100
+                            let heights = app.stage.height - 110
+                            gsap.to(button, {y: heights, repeat: -1, yoyo: true, duration: 0.6})
+                            app.stage.addChild(buttonContainer);
+                            gsap.to(winContainer, {alpha: 1, duration: 1})
+                            app.stage.addChild(winContainer)
+                            winContainer.alpha = 0;
+                            gsap.to(winContainer, {alpha: 1, duration: 1})
+                        }, 1500)
+                        
                         
                     }, 1000)
                 }
             } else {
                 console.log('different')
                 setTimeout(() => {
+                    let matchFail = new Howl({
+                        src: ['../assets/sounds/matchfail.wav'],
+                        volume: 0.5
+                    });
+                    matchFail.play()
                     names.forEach((elem) => {
                         elem.islock = false;
                         elem.front = true;

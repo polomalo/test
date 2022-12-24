@@ -18,8 +18,9 @@
     "core-js": "^3.6.4",
     "font-awesome": "^4.7.0",
     "gsap": "^3.11.3",
+    "howler": "^2.2.3",
     "pixi-multistyle-text": "^0.10.0",
-    "pixi.js": "^4.8.7"
+    "pixi.js": "^4.8.9"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
