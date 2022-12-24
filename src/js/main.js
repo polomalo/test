@@ -106,8 +106,6 @@ let container = new PIXI.Container();
 container.x = app.screen.width / 4;
 container.y = app.screen.height / 2.5;
 
-// container.pivot.x = container.width / 2;
-// container.pivot.y = container.height / 3;
 console.log(container.width)
 app.stage.addChild(container);
 let filter = new PIXI.filters.ColorMatrixFilter();
@@ -485,6 +483,10 @@ buttonText.x = Math.round((180 - buttonText.width) / 2)
 buttonText.y = Math.round((50 - buttonText.height) / 2)
 buttonContainer.alpha = 0;
 gsap.fromTo(buttonContainer, {y: 100}, {y: 0, duration: 1, delay: 1, alpha: 1})
+
+buttonContainer.on('pointerdown', () => {
+    window.open('https://pixijs.com/')
+})
 button.addChild(buttonText)
 buttonContainer.addChild(button)
 app.stage.addChild(buttonContainer);
