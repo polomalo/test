@@ -349,39 +349,38 @@ function onButtonDown() {
                             particleContainer.x = Math.round((400 - prizeBox.width) / 2);
                             particleContainer.y = Math.round((app.screen.height - prizeBox.height) / 2)
                             
-                            let stars = []
-                            for (let i = 0; i < 400; i++){
-                                let star = new PIXI.Sprite(starTexture);
-                                star.x = 0;
-                                star.y = 0;
-                                star.anchor.set(0.5);
-                                star.width = 0;
-                                star.height = 0;
-                                particleContainer.addChild(star)
-                                stars.push(star);
-                            }
                             setInterval(() => {
-                                for (let k = 0; k < 400; k++){
+                                let stars = [];
+                                for (let i = 0; i < 50; i++){
+                                    let star = new PIXI.Sprite(starTexture);
+                                    star.x = 0;
+                                    star.y = 0;
+                                    star.anchor.set(0.5);
+                                    star.width = 0;
+                                    star.height = 0;
+                                    star.alpha = 0;
+                                    particleContainer.addChild(star);
+                                    particleContainer.addChild(prizeBox);
+                                    stars.push(star);
+                                }
+                                for (let k = 0; k < stars.length; k++){
                                     let star = stars[k];
                                     let size = Math.random() * 30;
                                     let deg = Math.random() * Math.PI * 2;
                                     let distance = Math.random() * 150 + 1;
                                     gsap.to(star, { width: size,
                                                     height: size,
+                                                    alpha: 1,
                                                     x: Math.cos(deg) * distance,
                                                     y: Math.sin(deg) * distance,
                                                     duration: 1}).eventCallback('onComplete', () => {
-                                                        star.x = 0;
-                                                        star.y = 0;
+                                                        gsap.to(star, {alpha: 0, duration: 0.5}).eventCallback('onComplete', () => {
+                                                            particleContainer.removeChild(star)
+                                                        });
                                                     });
-                                    setTimeout(() => {
-                                        gsap.to(star, {width: 0, height: 0, duration: 1})
-                                    }, 1500)
-                                }
-                            }, 1000)
-
-
-                            particleContainer.addChild(prizeBox);
+                                };
+                                stars = [];
+                            }, 200)
                             winContainer.addChild(particleContainer);
 
                             let buttonTStyle = new PIXI.TextStyle({
