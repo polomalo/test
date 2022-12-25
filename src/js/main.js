@@ -106,7 +106,6 @@ let container = new PIXI.Container();
 container.x = app.screen.width / 4;
 container.y = app.screen.height / 2.5;
 
-console.log(container.width)
 app.stage.addChild(container);
 let filter = new PIXI.filters.ColorMatrixFilter();
 
@@ -180,9 +179,7 @@ for (let i = 0; i < 6; i++) {
             } else return
         })
     }
-    console.log(textureColor)
     let cardColorBack = textureColor[Math.floor(Math.random() * textureColor.length)];
-    console.log(cardColorBack)
     switch (cardColorBack){
         case 'dimond':
             dimond++;
@@ -205,7 +202,6 @@ for (let i = 0; i < 6; i++) {
     cardContainer.addChild(card);
     container.addChild(cardContainer);
 }
-console.log(textureColor)
 
 allCards.forEach((item,i) => {
     
@@ -256,7 +252,6 @@ function onButtonDown() {
     names.push(this)
 
     gsap.fromTo(this, {width: 110}, {width: 0, duration: 0.2}).eventCallback('onComplete', () => {
-        console.log('callback')
         if (this.front){
             click.play();
             switching(this)
@@ -287,7 +282,6 @@ function onButtonDown() {
                 console.log('same');
                 names[0].islock = true;
                 names.forEach((elem) => {
-                    console.log(elem)
                     gsap.to(elem, {rotation: 0.1, ease: 'power1.in'});
                     
                 })
