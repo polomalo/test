@@ -345,7 +345,7 @@ function onButtonDown() {
                             
                             setInterval(() => {
                                 let stars = [];
-                                for (let i = 0; i < 70; i++){
+                                for (let i = 0; i < 100; i++){
                                     let star = new PIXI.Sprite(starTexture);
                                     star.x = 0;
                                     star.y = 0;
@@ -361,17 +361,20 @@ function onButtonDown() {
                                     let star = stars[k];
                                     let size = Math.random() * 30;
                                     let deg = Math.random() * Math.PI * 2;
-                                    let distance = Math.random() * 150 + 1;
+                                    let distance = Math.random() * 200 + 1;
+                                    let duration = Math.random() * 3 + 1;
+                                    let delay = Math.random();
                                     gsap.to(star, { width: size,
                                                     height: size,
                                                     alpha: 1,
                                                     x: Math.cos(deg) * distance,
                                                     y: Math.sin(deg) * distance,
-                                                    duration: 1}).eventCallback('onComplete', () => {
-                                                        gsap.to(star, {alpha: 0, duration: 0.4}).eventCallback('onComplete', () => {
-                                                            particleContainer.removeChild(star);
-                                                        });
-                                                    });
+                                                    duration: duration,
+                                                    rotation: Math.random() * 2 * Math.PI,
+                                                    delay: delay});
+                                    gsap.to(star, {alpha: 0, duration: duration / 2, delay: delay / 2 + delay}).eventCallback('onComplete', () => {
+                                        particleContainer.removeChild(star);
+                                    });
                                 };
                                 stars = [];
                             }, 400)
