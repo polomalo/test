@@ -351,7 +351,7 @@ function onButtonDown() {
                             
                             setInterval(() => {
                                 let stars = [];
-                                for (let i = 0; i < 50; i++){
+                                for (let i = 0; i < 70; i++){
                                     let star = new PIXI.Sprite(starTexture);
                                     star.x = 0;
                                     star.y = 0;
@@ -374,13 +374,13 @@ function onButtonDown() {
                                                     x: Math.cos(deg) * distance,
                                                     y: Math.sin(deg) * distance,
                                                     duration: 1}).eventCallback('onComplete', () => {
-                                                        gsap.to(star, {alpha: 0, duration: 0.5}).eventCallback('onComplete', () => {
-                                                            particleContainer.removeChild(star)
+                                                        gsap.to(star, {alpha: 0, duration: 0.4}).eventCallback('onComplete', () => {
+                                                            particleContainer.removeChild(star);
                                                         });
                                                     });
                                 };
                                 stars = [];
-                            }, 200)
+                            }, 400)
                             winContainer.addChild(particleContainer);
 
                             let buttonTStyle = new PIXI.TextStyle({
